@@ -396,10 +396,12 @@ export default function App() {
 const OutreachTab=()=>{
     const [showNew,setShowNew]=useState(false);
     const [nf,setNf]=useState({name:"",filters:"",listSize:"",emailLink:"",openRate:"",ctr:"",sender:"",status:"Active",notes:"",contacts:[]});
+    const [newContacts,setNewContacts]=useState({});
+    const [localNotes,setLocalNotes]=useState({});
     const campaigns=data.outreach||[];
     return <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-        <div><h2 style={{margin:0,fontSize:20,fontWeight:700,color:C.cream,fontFamily:ff}}>Outreach Campaigns</h2><div style={S.sub}>Apollo → HubSpot → Targeted Emails from Brittany & Alyssa</div></div>
+        <div><h2 style={{margin:0,fontSize:20,fontWeight:700,color:C.cream,fontFamily:ff}}>Outreach Campaigns</h2><div style={S.sub}>Apollo → HubSpot → Targeted Emails</div></div>
         <button onClick={()=>setShowNew(true)} style={S.btnP}>+ New Campaign</button>
       </div>
       {showNew&&<div style={{...S.card,marginBottom:14}}>
@@ -407,7 +409,7 @@ const OutreachTab=()=>{
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
           <div><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>Campaign Name</div><input value={nf.name} onChange={e=>setNf({...nf,name:e.target.value})} placeholder="e.g., Senior Living Ohio Q2" style={S.input} /></div>
           <div><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>Sender</div><select value={nf.sender} onChange={e=>setNf({...nf,sender:e.target.value})} style={S.select}><option value="">Select...</option><option>Brittany</option><option>Alyssa</option><option>Josh</option><option>Zack</option><option>Dave</option></select></div>
-          <div style={{gridColumn:"1/-1"}}><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>Apollo Search Filters / Tags</div><input value={nf.filters} onChange={e=>setNf({...nf,filters:e.target.value})} placeholder="e.g., Senior Living, Ohio, VP+, 50-500 employees" style={S.input} /></div>
+          <div style={{gridColumn:"1/-1"}}><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>Apollo Search Filters / Tags</div><input value={nf.filters} onChange={e=>setNf({...nf,filters:e.target.value})} placeholder="e.g., Senior Living, Ohio, VP+" style={S.input} /></div>
           <div><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>List Size</div><input type="number" value={nf.listSize} onChange={e=>setNf({...nf,listSize:e.target.value})} placeholder="0" style={S.input} /></div>
           <div><div style={{fontSize:10,color:C.textSecondary,marginBottom:3}}>HubSpot Email Link</div><input value={nf.emailLink} onChange={e=>setNf({...nf,emailLink:e.target.value})} placeholder="https://app.hubspot.com/..." style={S.input} /></div>
         </div>
@@ -418,7 +420,9 @@ const OutreachTab=()=>{
       </div>}
       {campaigns.length===0&&!showNew?<div style={{...S.card,textAlign:"center",padding:40}}><div style={{fontSize:36,marginBottom:8}}>📤</div><div style={{fontSize:13,color:C.textSecondary,fontFamily:fb}}>No outreach campaigns yet</div></div>:
         campaigns.map((camp,ci)=>{
-          const [newContact,setNewContact]=useState({name:"",title:"",email:""});
+          const nc=newContacts[camp.id]||{name:"",title:"",email:""};
+          const setNc=val=>setNewContacts(prev=>({...prev,[camp.id]:typeof val==="function"?val(prev[camp.id]||{name:"",title:"",email:""}):val}));
+          const noteVal=localNotes[camp.id]!==undefined?localNotes[camp.id]:camp.notes||"";
           return <div key={camp.id} style={{...S.card,marginBottom:10}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
               <div><div style={{fontSize:15,fontWeight:700,color:C.cream,fontFamily:ff}}>{camp.name}</div><div style={S.dim}>{camp.date} · Sent from: {camp.sender||"TBD"}</div></div>
@@ -440,7 +444,7 @@ const OutreachTab=()=>{
             </div>
             {camp.emailLink&&<div style={{marginBottom:8}}><div style={{fontSize:9,color:C.textSecondary,marginBottom:3}}>HubSpot Link</div><a href={camp.emailLink} target="_blank" rel="noopener noreferrer" style={{fontSize:12,color:C.gold,fontFamily:fb}}>{camp.emailLink}</a></div>}
             <div style={{marginBottom:10}}><div style={{fontSize:9,color:C.textSecondary,marginBottom:3}}>Notes</div>
-              <textarea value={camp.notes||""} onChange={e=>{const v=e.target.value;up(d=>{d.outreach[ci].notes=v;return d;});}} placeholder="Campaign notes..." rows={3} style={{...S.input,resize:"vertical"}} />
+              <textarea value={noteVal} onChange={e=>{const v=e.target.value;setLocalNotes(prev=>({...prev,[camp.id]:v}));}} onBlur={()=>up(d=>{d.outreach[ci].notes=noteVal;return d;})} placeholder="Campaign notes..." rows={3} style={{...S.input,resize:"vertical"}} />
             </div>
             <div style={{...S.section,marginTop:4}}>Target Contacts</div>
             {(camp.contacts||[]).length===0&&<div style={{fontSize:11,color:C.textDim,fontFamily:fb,marginBottom:6}}>No contacts added yet.</div>}
@@ -451,10 +455,10 @@ const OutreachTab=()=>{
               <button onClick={()=>up(d=>{d.outreach[ci].contacts.splice(cti,1);return d;})} style={{...S.btnD,padding:"1px 5px",fontSize:8}}>✕</button>
             </div>)}
             <div style={{display:"flex",gap:6,marginTop:8,flexWrap:"wrap"}}>
-              <input value={newContact.name} onChange={e=>setNewContact(c=>({...c,name:e.target.value}))} placeholder="Name" style={{...S.input,flex:1,fontSize:11}} />
-              <input value={newContact.title} onChange={e=>setNewContact(c=>({...c,title:e.target.value}))} placeholder="Title" style={{...S.input,flex:1,fontSize:11}} />
-              <input value={newContact.email} onChange={e=>setNewContact(c=>({...c,email:e.target.value}))} placeholder="Email" style={{...S.input,flex:1,fontSize:11}} />
-              <button onClick={()=>{if(!newContact.name.trim())return;up(d=>{if(!d.outreach[ci].contacts)d.outreach[ci].contacts=[];d.outreach[ci].contacts.push({...newContact});return d;});setNewContact({name:"",title:"",email:""}); }} style={S.btnP}>+ Add</button>
+              <input value={nc.name} onChange={e=>setNc(p=>({...p,name:e.target.value}))} placeholder="Name" style={{...S.input,flex:1,fontSize:11}} />
+              <input value={nc.title} onChange={e=>setNc(p=>({...p,title:e.target.value}))} placeholder="Title" style={{...S.input,flex:1,fontSize:11}} />
+              <input value={nc.email} onChange={e=>setNc(p=>({...p,email:e.target.value}))} placeholder="Email" style={{...S.input,flex:1,fontSize:11}} />
+              <button onClick={()=>{if(!nc.name.trim())return;up(d=>{if(!d.outreach[ci].contacts)d.outreach[ci].contacts=[];d.outreach[ci].contacts.push({name:nc.name,title:nc.title,email:nc.email});return d;});setNc({name:"",title:"",email:""});}} style={S.btnP}>+ Add</button>
             </div>
           </div>;
         })
