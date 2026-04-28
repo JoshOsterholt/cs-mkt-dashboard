@@ -1062,7 +1062,11 @@ const OutreachTab=()=>{
   return <div style={{background:`linear-gradient(145deg,${C.navy} 0%,${C.bg2} 40%,${C.navy} 100%)`,minHeight:"100vh",color:C.cream,fontFamily:fb}}>
     <div style={{background:`linear-gradient(90deg,rgba(200,169,110,0.08) 0%,rgba(13,27,42,0) 100%)`,borderBottom:`1px solid ${C.cardBorder}`,padding:"12px 22px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div><div style={{fontSize:9,letterSpacing:4,color:C.gold,textTransform:"uppercase",fontWeight:600,fontFamily:ff}}>Contract Source</div><h1 style={{margin:0,fontSize:18,fontWeight:700,color:C.cream,fontFamily:ff}}>2026 Marketing Command Center</h1></div>
+        <div style={{display:"flex",alignItems:"center",gap:16}}>
+  <img src="/white_no_back.svg" alt="Contract Source" style={{height:36}} />
+  <div style={{width:1,height:36,background:`rgba(200,169,110,0.2)`}} />
+  <h1 style={{margin:0,fontSize:16,fontWeight:600,color:C.textSecondary,fontFamily:ff}}>2026 Marketing Command Center</h1>
+</div>
         <div style={{display:"flex",gap:8}}><span style={{fontSize:9,color:C.textDim,alignSelf:"center",fontFamily:fb}}>Auto-saves</span><button onClick={async()=>{await sv(data);alert("Saved!");}} style={S.btn}>💾</button><button onClick={()=>{if(confirm("Reset ALL data?")){setData(DEF);sv(DEF);}}} style={S.btnD}>Reset</button></div>
       </div>
     </div>
