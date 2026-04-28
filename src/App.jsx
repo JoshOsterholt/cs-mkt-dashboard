@@ -229,7 +229,7 @@ const TABS = [
 // ═══ MAIN APP ═══
 export default function App() {
   const [data,setData]=useState(null);const [tab,setTab]=useState("today");const [loading,setLoading]=useState(true);const [detail,setDetail]=useState(null);const [showNewProspect,setShowNewProspect]=useState(false);const sr=useRef(null);
-  useEffect(()=>{load().then(d=>{setData(d&&typeof d==='object'&&!Array.isArray(d)?d:DEF);setLoading(false);});},[]);
+  useEffect(()=>{load().then(d=>{const valid=d&&typeof d==='object'&&!Array.isArray(d)&&Object.keys(d).length>0;setData(valid?d:DEF);setLoading(false);});},[]);
   const up=useCallback(fn=>{setData(prev=>{const next=fn(JSON.parse(JSON.stringify(prev)));if(sr.current)clearTimeout(sr.current);sr.current=setTimeout(()=>sv(next),400);return next;});},[]);
 
   if(loading||!data) return <div style={{background:C.navy,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:C.gold,fontFamily:ff}}>Loading...</div>;
