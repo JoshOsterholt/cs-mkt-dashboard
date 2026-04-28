@@ -2,10 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 // ═══ STORAGE ═══
-const SKEY = "cs-mktg-dash-v8";
-import localforage from "localforage";
-const load = async () => { try { const r = await localforage.getItem(SKEY); return r ? JSON.parse(r) : null; } catch { return null; } };
-const sv = async d => { try { await localforage.setItem(SKEY, JSON.stringify(d)); } catch(e) { console.error(e); } };
+import { loadData as load, saveData as sv } from "./storage.js";
 
 // ═══ BRAND COLORS ═══
 const C = {
